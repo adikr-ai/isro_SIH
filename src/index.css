@@ -1,0 +1,124 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #0b1221;
+  background-image: radial-gradient(circle at 15% 15%, rgba(21, 194, 245, 0.18), transparent 45%), radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.12), transparent 55%), radial-gradient(circle at 50% 80%, rgba(252, 211, 77, 0.12), transparent 60%);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+a {
+  color: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.glass-panel {
+  background: rgba(17, 27, 43, 0.72);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  border: 1px solid rgba(96, 225, 250, 0.18);
+}
+
+.card-border {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.text-neon {
+  text-shadow: 0 0 20px rgba(21, 194, 245, 0.55);
+}
+
+.hero-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: -120px;
+  background: radial-gradient(circle at 30% 20%, rgba(96, 225, 250, 0.15), transparent 60%),
+    radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.12), transparent 55%),
+    radial-gradient(circle at 50% 80%, rgba(252, 211, 77, 0.1), transparent 60%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(transparent 94%, rgba(96, 225, 250, 0.12) 96%),
+    linear-gradient(90deg, transparent 94%, rgba(168, 85, 247, 0.12) 96%);
+  background-size: 180px 180px;
+  opacity: 0.25;
+  mix-blend-mode: screen;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-orbit-ring {
+  position: absolute;
+  right: -120px;
+  bottom: -140px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  border: 2px solid rgba(96, 225, 250, 0.18);
+  box-shadow: 0 0 120px rgba(21, 194, 245, 0.15);
+  animation: orbitPulse 14s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.hero-orbit-ring::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px dashed rgba(168, 85, 247, 0.35);
+}
+
+.hero-streak {
+  position: absolute;
+  left: 10%;
+  top: 55%;
+  width: 280px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(96, 225, 250, 0.8), transparent);
+  filter: blur(0.5px);
+  animation: sweep 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes orbitPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-40%) scaleX(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateX(140%) scaleX(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(200%) scaleX(0.6);
+    opacity: 0;
+  }
+}
