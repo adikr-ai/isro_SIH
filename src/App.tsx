@@ -13,12 +13,40 @@ import {
   scenarioNotes
 } from './data/mockErrorData.js';
 
-const TIMEFRAMES = [
+type TimeframeOption = {
+  id: string;
+  label: string;
+  hours: number;
+};
+
+type TelemetryPoint = {
+  timestamp: string;
+  clockUpload: number;
+  clockModel: number;
+  ephemerisUpload: number;
+  ephemerisModel: number;
+  driftRate: number;
+};
+
+
+
+type Summary = {
+  clockBias: number;
+  clockDelta: number;
+  ephemerisResidual: number;
+  ephemerisDelta: number;
+  driftRate: number;
+  excursionRate: number;
+};
+
+
+const TIMEFRAMES: TimeframeOption[] = [
   { id: '72H', label: 'Last 72 hours', hours: 72 },
   { id: '7D', label: 'Last 7 days', hours: 24 * 7 },
   { id: '30D', label: 'Last 30 days', hours: 24 * 30 }
 ];
-const calcSummary = (series) => {
+
+const calcSummary = (series: TelemetryPoint[]): Summary => {
   if (!series.length) {
     return {
       clockBias: 0,
@@ -28,10 +56,11 @@ const calcSummary = (series) => {
       driftRate: 0,
       excursionRate: 0
     };
+  
   }
-
-  const first = series[0];
+   
   const latest = series[series.length - 1];
+  const first = series[0];
 
   const clockBias = latest.clockUpload - latest.clockModel;
   const clockDelta = clockBias - (first.clockUpload - first.clockModel);
@@ -40,9 +69,12 @@ const calcSummary = (series) => {
   const firstEphemerisResidual = first.ephemerisUpload - first.ephemerisModel;
   const ephemerisResidual = latestEphemerisResidual;
   const ephemerisDelta = ephemerisResidual - firstEphemerisResidual;
+
   const driftRate = latest.driftRate;
 
-  const excursionRate = series.reduce((acc, point) => {
+  const Latest = series[series.length -1];
+
+  const excursionCount = series.reduce((acc, point) => {
     const clockDiff = Math.abs(point.clockUpload - point.clockModel);
     const ephDiff = Math.abs(point.ephemerisUpload - point.ephemerisModel);
     return acc + (clockDiff > 1.2 || ephDiff > 5 ? 1 : 0);
@@ -54,23 +86,27 @@ const calcSummary = (series) => {
     ephemerisResidual,
     ephemerisDelta,
     driftRate,
-    excursionRate: (excursionRate / series.length) * 100
+    excursionRate: (excursionCount / series.length) * 100
   };
 };
 
-const formatDelta = (value, unit) => {
+const formatDelta = (value: number, unit: string) => {
   const sign = value > 0 ? '+' : '';
   return `${sign}${value.toFixed(2)} ${unit}`;
 };
 
-const formatPercent = (value) => `${value.toFixed(1)}%`;
+const formatPercent = (value: number) => `${value.toFixed(1)}%`;
+
+  
 
 function App() {
-  const [selectedSatellite, setSelectedSatellite] = useState(satellites[0].id);
-  const [timeframe, setTimeframe] = useState(TIMEFRAMES[0]);
+  const [selectedSatellite, setSelectedSatellite] = useState<string>(satellites[0].id);
+  const [timeframe, setTimeframe] = useState<TimeframeOption>(TIMEFRAMES[0]);
 
-  const filteredSeries = useMemo(() => {
-    const rawSeries = telemetrySeries[selectedSatellite] ?? [];
+  const filteredSeries = useMemo<TelemetryPoint[]>(() => {
+    const rawSeries =
+      (telemetrySeries as Record<string, TelemetryPoint[]>)[selectedSatellite] ?? [];
+
     if (!rawSeries.length) {
       return [];
     }
@@ -79,12 +115,10 @@ function App() {
     return rawSeries.filter((entry) => new Date(entry.timestamp).getTime() >= cutoff);
   }, [selectedSatellite, timeframe]);
 
-  
-
   const summary = useMemo(() => calcSummary(filteredSeries), [filteredSeries]);
 
-  const tolerance = toleranceBands[selectedSatellite] ?? [];
-  const notes = scenarioNotes[selectedSatellite] ?? [];
+  const tolerance = (toleranceBands as Record<string, any[]>)[selectedSatellite] ?? [];
+  const notes = (scenarioNotes as Record<string, any[]>)[selectedSatellite] ?? [];
 
   return (
     <div className="min-h-screen bg-night bg-space-gradient text-slate-100">
@@ -95,7 +129,6 @@ function App() {
         onSatelliteChange={setSelectedSatellite}
         selectedTimeframe={timeframe}
         onTimeframeChange={setTimeframe}
-          
       />
 
       <main className="mx-auto max-w-6xl space-y-14 px-6 pb-24">
@@ -118,16 +151,16 @@ function App() {
             delta={formatDelta(summary.driftRate - 0.016, 'vs model')}
             sentiment={summary.driftRate > 0.12 ? 'warn' : 'success'}
           />
-          <MetricCard 
-            title="Excursion Rate"
+          <MetricCard
+            title="Excursion Probability"
             value={formatPercent(summary.excursionRate)}
-            delta="tolerance breaches"
-            sentiment={summary.excursionRate > 5 ? 'warn' : 'success'}
+            delta={`${summary.excursionRate.toFixed(1)}% beyond limit`}
+            sentiment={summary.excursionRate > 15 ? 'warn' : 'success'}
           />
         </section>
 
         <section className="glass-panel card-border rounded-3xl p-8 shadow-glow">
-          <ClockEphemerisChart data={filteredSeries} />
+          <ClockEphemerisChart data={filteredSeries} timeframeLabel={timeframe.label} />
         </section>
 
         <div className="grid gap-8 lg:grid-cols-2">

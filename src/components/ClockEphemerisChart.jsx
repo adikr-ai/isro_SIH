@@ -82,10 +82,15 @@ ClockEphemerisChart.propTypes = {
       clockUpload: PropTypes.number.isRequired,
       clockModel: PropTypes.number.isRequired,
       ephemerisUpload: PropTypes.number.isRequired,
-      ephemerisModel: PropTypes.number.isRequired
+      ephemerisModel: PropTypes.number.isRequired,
     })
   ).isRequired,
   timeframeLabel: PropTypes.string.isRequired
+ 
 };
 
+
+
 export default ClockEphemerisChart;
+
+

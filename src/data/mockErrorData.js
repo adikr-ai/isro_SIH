@@ -46,8 +46,13 @@ export const telemetrySeries = {
 export const toleranceBands = {
   'GSAT-101': makeTolerance(0.01),
   'GSAT-204': makeTolerance(0.016),
-  'GSAT-312': makeTolerance(0.012)
+  'GSAT-312': makeTolerance(0.012),
+  'GSAT-310': makeTolerance(0.013),
+  'GSAT-306': makeTolerance(0.016)
 };
+
+
+
 
 export const scenarioNotes = {
   'GSAT-101': [

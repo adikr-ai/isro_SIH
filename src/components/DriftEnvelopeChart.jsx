@@ -9,6 +9,7 @@ const buildProjection = (series, tolerance) => {
   const latest = series[series.length - 1];
 
   return tolerance.map((band) => ({
+    
     horizon: band.horizon,
     expected: latest.driftRate + band.biasAdjustment,
     upper: band.upper,
@@ -16,7 +17,7 @@ const buildProjection = (series, tolerance) => {
   }));
 };
 
-const DriftEnvelopeChart = ({ data, tolerance }) => {
+const DriftEnvelopeChart = ({ data, tolerance }) => { 
   const chartData = buildProjection(data, tolerance);
 
   return (
